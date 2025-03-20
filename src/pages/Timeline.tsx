@@ -5,6 +5,7 @@ import { Toaster } from 'sonner';
 import Navbar from '@/components/Navbar';
 import TimelineView from '@/components/Timeline';
 import Onboarding from '@/components/Onboarding';
+import { useScroll } from '@/contexts/ScrollContext';
 
 const Timeline = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -31,15 +32,17 @@ const Timeline = () => {
   }
   
   return (
-    <div className="min-h-screen flex flex-col dark:bg-slate-900 transition-colors duration-300">
+    <div className="min-h-screen flex flex-col dark:bg-slate-900 transition-colors duration-300" data-scroll-section>
       <Navbar />
       
-      <main className="flex-grow p-6 md:p-8 pt-24">
+      <main className="flex-grow p-6 md:p-8 pt-24" data-scroll-section>
         <div className="container">
           {needsOnboarding ? (
             <Onboarding />
           ) : (
-            <TimelineView />
+            <div data-scroll data-scroll-speed="0.3">
+              <TimelineView />
+            </div>
           )}
         </div>
       </main>
