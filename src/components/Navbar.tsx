@@ -12,6 +12,7 @@ import {
   LogIn 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -55,14 +56,14 @@ const Navbar = () => {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         isScrolled || mobileMenuOpen 
-          ? "bg-white/80 backdrop-blur-lg shadow-sm py-2" 
+          ? "bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-sm py-2" 
           : "bg-transparent py-4"
       )}
     >
       <div className="container flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center">
-          <div className="font-bold text-2xl text-medmate-600 tracking-tight">
+          <div className="font-bold text-2xl text-medmate-600 dark:text-medmate-400 tracking-tight">
             Med<span className="text-medmate-500">Mate</span>
           </div>
         </Link>
@@ -80,6 +81,7 @@ const Navbar = () => {
               <NavLink href="/profile" isActive={isActive('/profile')} icon={<User className="w-4 h-4 mr-1" />}>
                 Profile
               </NavLink>
+              <ThemeToggle />
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -92,6 +94,7 @@ const Navbar = () => {
             </>
           ) : (
             <>
+              <ThemeToggle />
               <Link to="/sign-in">
                 <Button variant="ghost" size="sm" className="text-foreground hover:text-medmate-600 flex items-center px-3">
                   <LogIn className="w-4 h-4 mr-1" />
@@ -108,22 +111,25 @@ const Navbar = () => {
         </nav>
 
         {/* Mobile Menu Button */}
-        <button 
-          className="md:hidden p-2 focus:outline-none"
-          onClick={toggleMobileMenu}
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? (
-            <X className="w-6 h-6 text-medmate-600" />
-          ) : (
-            <Menu className="w-6 h-6 text-medmate-600" />
-          )}
-        </button>
+        <div className="md:hidden flex items-center gap-2">
+          <ThemeToggle />
+          <button 
+            className="p-2 focus:outline-none"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? (
+              <X className="w-6 h-6 text-medmate-600 dark:text-medmate-400" />
+            ) : (
+              <Menu className="w-6 h-6 text-medmate-600 dark:text-medmate-400" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-white/90 backdrop-blur-lg shadow-md animate-fade-in">
+        <div className="md:hidden absolute top-full left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg shadow-md animate-fade-in">
           <div className="container py-4 flex flex-col space-y-3">
             {isAuthenticated ? (
               <>
@@ -183,8 +189,8 @@ const NavLink = ({
     className={cn(
       "px-3 py-1.5 text-sm font-medium rounded-md flex items-center transition-colors",
       isActive 
-        ? "text-medmate-600 bg-medmate-50" 
-        : "text-muted-foreground hover:text-foreground hover:bg-medmate-50/50"
+        ? "text-medmate-600 dark:text-medmate-400 bg-medmate-50 dark:bg-medmate-900/50" 
+        : "text-muted-foreground hover:text-foreground hover:bg-medmate-50/50 dark:hover:bg-medmate-900/20"
     )}
   >
     {icon}
@@ -208,8 +214,8 @@ const MobileNavLink = ({
     className={cn(
       "px-4 py-2 text-base font-medium rounded-lg flex items-center",
       isActive 
-        ? "text-medmate-600 bg-medmate-50" 
-        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+        ? "text-medmate-600 dark:text-medmate-400 bg-medmate-50 dark:bg-medmate-900/50" 
+        : "text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-medmate-900/20"
     )}
   >
     {icon}

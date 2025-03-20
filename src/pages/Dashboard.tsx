@@ -31,7 +31,7 @@ const Dashboard = () => {
   }
   
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col dark:bg-slate-900 transition-colors duration-300">
       <Navbar />
       
       <main className="flex-grow p-6 md:p-8 pt-24">

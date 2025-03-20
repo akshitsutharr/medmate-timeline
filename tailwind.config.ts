@@ -115,6 +115,14 @@ export default {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.85' },
 				},
+				'rotate-3d': {
+					'0%': { transform: 'rotate3d(0, 1, 0, 0deg)' },
+					'100%': { transform: 'rotate3d(0, 1, 0, 360deg)' },
+				},
+				'bounce-subtle': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' },
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -125,6 +133,8 @@ export default {
 				'slide-out': 'slide-out 0.4s ease-out',
 				'float': 'float 6s ease-in-out infinite',
 				'pulse-subtle': 'pulse-subtle 3s ease-in-out infinite',
+				'rotate-slow': 'rotate-3d 15s linear infinite',
+				'bounce-subtle': 'bounce-subtle 3s ease-in-out infinite',
 			},
 			boxShadow: {
 				'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',

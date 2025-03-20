@@ -36,6 +36,36 @@
     --radius: 0.75rem;
   }
 
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 196 94% 48%;
+    --primary-foreground: 222 47% 11%;
+
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 196 94% 14%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 27%;
+    --input: 217 33% 27%;
+    --ring: 196 94% 48%;
+  }
+
   * {
     @apply border-border;
   }
@@ -48,19 +78,19 @@
 
 @layer components {
   .glass-card {
-    @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-glass rounded-xl;
+    @apply bg-white/70 dark:bg-slate-800/70 backdrop-blur-lg border border-white/20 dark:border-slate-700/50 shadow-glass rounded-xl;
   }
 
   .glass-card-hover {
-    @apply glass-card transition-all duration-300 hover:shadow-glass-strong hover:bg-white/80;
+    @apply glass-card transition-all duration-300 hover:shadow-glass-strong hover:bg-white/80 dark:hover:bg-slate-800/80;
   }
 
   .timeline-dot {
-    @apply w-4 h-4 rounded-full bg-medmate-500 border-4 border-white shadow-md z-10;
+    @apply w-4 h-4 rounded-full bg-medmate-500 border-4 border-white dark:border-slate-800 shadow-md z-10;
   }
 
   .timeline-line {
-    @apply absolute top-0 bottom-0 left-[7px] w-0.5 bg-medmate-200 z-0;
+    @apply absolute top-0 bottom-0 left-[7px] w-0.5 bg-medmate-200 dark:bg-medmate-700 z-0;
   }
 
   .timeline-card {
