@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   CheckCircle2, 
@@ -46,7 +45,6 @@ import * as z from 'zod';
 import { toast } from 'sonner';
 import DocumentUpload from './DocumentUpload';
 
-// Define form validation schema
 const profileSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   dob: z.string().min(1, { message: 'Date of birth is required.' }),
@@ -66,6 +64,16 @@ const Onboarding = () => {
   const [isDocUploadOpen, setIsDocUploadOpen] = useState(false);
   const [onboardingComplete, setOnboardingComplete] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (onboardingComplete) {
+      const redirectTimeout = setTimeout(() => {
+        navigate('/dashboard');
+      }, 2000);
+      
+      return () => clearTimeout(redirectTimeout);
+    }
+  }, [onboardingComplete, navigate]);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -97,7 +105,6 @@ const Onboarding = () => {
   const onSubmit = (data: ProfileFormValues) => {
     console.log('Form data submitted:', data);
     
-    // Store the user profile data to localStorage
     const userProfile = {
       ...data,
       allergies: data.allergies ? data.allergies.split('\n').filter(Boolean) : [],
@@ -110,9 +117,6 @@ const Onboarding = () => {
     
     if (currentStep === 3) {
       setOnboardingComplete(true);
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 2000);
     } else {
       handleNext();
     }
@@ -121,9 +125,6 @@ const Onboarding = () => {
   const handleSkip = () => {
     if (currentStep === 3) {
       setOnboardingComplete(true);
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 2000);
     } else {
       handleNext();
     }
@@ -161,7 +162,6 @@ const Onboarding = () => {
         </Card>
       ) : (
         <>
-          {/* Stepper component */}
           <div className="mb-8">
             <div className="flex justify-between">
               {steps.map((step) => (
@@ -202,7 +202,6 @@ const Onboarding = () => {
             </div>
           </div>
 
-          {/* Step 1: Personal Information */}
           {currentStep === 1 && (
             <Card className="glass-card mb-8 animate-fade-in">
               <CardHeader>
@@ -318,7 +317,6 @@ const Onboarding = () => {
             </Card>
           )}
 
-          {/* Step 2: Medical Information */}
           {currentStep === 2 && (
             <Card className="glass-card mb-8 animate-fade-in">
               <CardHeader>
@@ -462,7 +460,6 @@ const Onboarding = () => {
             </Card>
           )}
 
-          {/* Step 3: Medical Records */}
           {currentStep === 3 && (
             <Card className="glass-card mb-8 animate-fade-in">
               <CardHeader>
