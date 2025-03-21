@@ -3,9 +3,15 @@ import React, { createContext, useContext, useRef, useEffect } from 'react';
 import useLocomotiveScroll from '@/hooks/useLocomotiveScroll';
 import { useIsMobile } from '@/hooks/use-mobile';
 
+// Import the interface or define it inline
+interface LocomotiveScrollInstance extends LocomotiveScroll {
+  update: () => void;
+  destroy: () => void;
+}
+
 type ScrollContextType = {
   containerRef: React.RefObject<HTMLDivElement>;
-  scrollInstance: any;
+  scrollInstance: LocomotiveScrollInstance | null;
 };
 
 const ScrollContext = createContext<ScrollContextType | undefined>(undefined);

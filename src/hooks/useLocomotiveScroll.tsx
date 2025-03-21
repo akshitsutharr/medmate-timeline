@@ -11,6 +11,12 @@ interface UseLocomotiveScrollOptions {
   initOnMount?: boolean;
 }
 
+// Define a more complete interface for the LocomotiveScroll instance
+interface LocomotiveScrollInstance extends LocomotiveScroll {
+  update: () => void;
+  destroy: () => void;
+}
+
 const useLocomotiveScroll = ({
   ref,
   smooth = true,
@@ -18,19 +24,18 @@ const useLocomotiveScroll = ({
   class: className = 'has-scroll-smooth',
   initOnMount = true,
 }: UseLocomotiveScrollOptions) => {
-  const locomotiveScrollRef = useRef<LocomotiveScroll | null>(null);
+  const locomotiveScrollRef = useRef<LocomotiveScrollInstance | null>(null);
 
   useEffect(() => {
     if (!ref.current || !initOnMount) return;
 
     // Initialize Locomotive Scroll with proper typing
     locomotiveScrollRef.current = new LocomotiveScroll({
-      // Type assertion to accommodate locomotive-scroll's types
       el: ref.current as HTMLElement,
       smooth,
       multiplier,
       class: className,
-    } as any);
+    }) as LocomotiveScrollInstance;
 
     // Clean up
     return () => {

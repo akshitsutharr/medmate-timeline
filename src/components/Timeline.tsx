@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -10,7 +11,8 @@ import {
   Hospital,
   Heart,
   Pill,
-  Stethoscope
+  Stethoscope,
+  Loader2
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
