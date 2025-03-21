@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
   Menu, 
@@ -9,23 +8,51 @@ import {
   User, 
   LayoutDashboard, 
   LogOut, 
-  LogIn 
+  LogIn,
+  MessageSquare
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/ThemeToggle';
+import { toast } from 'sonner';
+
+const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
+};
+
+const deleteCookie = (name: string) => {
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+};
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   
-  // This is a placeholder for actual authentication
-  // In a real implementation, this would check if the user is logged in
   useEffect(() => {
-    // Check localStorage or session for authenticated status
-    const checkAuth = localStorage.getItem('medmate-authenticated');
-    setIsAuthenticated(checkAuth === 'true');
+    const checkAuth = () => {
+      const localAuth = localStorage.getItem('medmate-authenticated');
+      const cookieAuth = getCookie('medmate-auth');
+      
+      const isAuth = localAuth === 'true' || cookieAuth === 'true';
+      setIsAuthenticated(isAuth);
+      
+      if (cookieAuth === 'true' && localAuth !== 'true') {
+        localStorage.setItem('medmate-authenticated', 'true');
+      }
+      
+      const email = localStorage.getItem('medmate-user-email') || getCookie('medmate-user-email');
+      setUserEmail(email);
+    };
+    
+    checkAuth();
+    window.addEventListener('storage', checkAuth);
+    return () => window.removeEventListener('storage', checkAuth);
   }, []);
 
   useEffect(() => {
@@ -47,8 +74,13 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('medmate-authenticated');
+    localStorage.removeItem('medmate-user-email');
+    deleteCookie('medmate-auth');
+    deleteCookie('medmate-user-email');
+    
     setIsAuthenticated(false);
-    // Navigate to home page or login page
+    toast.success('Logged out successfully');
+    navigate('/');
   };
 
   return (
@@ -61,14 +93,12 @@ const Navbar = () => {
       )}
     >
       <div className="container flex items-center justify-between">
-        {/* Logo */}
         <Link to="/" className="flex items-center">
           <div className="font-bold text-2xl text-medmate-600 dark:text-medmate-400 tracking-tight">
             Med<span className="text-medmate-500">Mate</span>
           </div>
         </Link>
 
-        {/* Desktop Menu */}
         <nav className="hidden md:flex items-center space-x-1">
           {isAuthenticated ? (
             <>
@@ -81,6 +111,9 @@ const Navbar = () => {
               <NavLink href="/profile" isActive={isActive('/profile')} icon={<User className="w-4 h-4 mr-1" />}>
                 Profile
               </NavLink>
+              <div className="text-sm text-muted-foreground ml-2 mr-4">
+                {userEmail && <span className="hidden lg:inline-block">{userEmail}</span>}
+              </div>
               <ThemeToggle />
               <Button 
                 variant="ghost" 
@@ -110,7 +143,6 @@ const Navbar = () => {
           )}
         </nav>
 
-        {/* Mobile Menu Button */}
         <div className="md:hidden flex items-center gap-2">
           <ThemeToggle />
           <button 
@@ -127,7 +159,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg shadow-md animate-fade-in">
           <div className="container py-4 flex flex-col space-y-3">
@@ -172,7 +203,6 @@ const Navbar = () => {
   );
 };
 
-// Helper components for nav links
 const NavLink = ({ 
   href, 
   isActive, 

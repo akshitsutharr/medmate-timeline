@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Calendar, 
@@ -18,86 +17,71 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import DocumentUpload from './DocumentUpload';
 
-// Mock data for medical records
-const MOCK_RECORDS = [
-  {
-    id: 1,
-    date: new Date('2023-11-15'),
-    type: 'Checkup',
-    title: 'Annual Physical Examination',
-    provider: 'Dr. Sarah Johnson',
-    location: 'City Health Clinic',
-    description: 'Routine annual physical examination. All vital signs normal.',
-    documents: [
-      { name: 'Physical Exam Report.pdf', size: '2.3 MB' }
-    ],
-    icon: Stethoscope
-  },
-  {
-    id: 2,
-    date: new Date('2023-08-05'),
-    type: 'Lab Test',
-    title: 'Blood Work Panel',
-    provider: 'Quest Diagnostics',
-    location: 'Quest Lab Center',
-    description: 'Complete blood count, metabolic panel, and lipid profile.',
-    documents: [
-      { name: 'Lab Results.pdf', size: '1.1 MB' },
-      { name: 'Doctor Notes.pdf', size: '0.5 MB' }
-    ],
-    icon: Hospital
-  },
-  {
-    id: 3,
-    date: new Date('2023-05-20'),
-    type: 'Vaccination',
-    title: 'Influenza Vaccine',
-    provider: 'Nurse Practitioner Emily Chen',
-    location: 'Community Pharmacy',
-    description: 'Seasonal influenza vaccination. No adverse reactions observed.',
-    documents: [
-      { name: 'Vaccination Record.pdf', size: '0.8 MB' }
-    ],
-    icon: Pill
-  },
-  {
-    id: 4,
-    date: new Date('2022-12-10'),
-    type: 'Specialist',
-    title: 'Cardiology Consultation',
-    provider: 'Dr. Michael Rodriguez',
-    location: 'Heart Center Medical Group',
-    description: 'Follow-up consultation for heart palpitations. ECG performed.',
-    documents: [
-      { name: 'Cardiology Report.pdf', size: '3.2 MB' },
-      { name: 'ECG Results.pdf', size: '1.7 MB' }
-    ],
-    icon: Heart
-  }
-];
-
-// Record type icons
-const typeIcons = {
+// Record type icons mapping
+const typeIcons: Record<string, any> = {
   'Checkup': Stethoscope,
   'Lab Test': Hospital,
   'Vaccination': Pill,
-  'Specialist': Heart
+  'Specialist': Heart,
+  'Hospitalization': Hospital,
+  'Surgery': Hospital,
+  'Imaging': Hospital,
+  'Other': FileText
 };
 
 const TimelineView = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedRecords, setExpandedRecords] = useState<number[]>([]);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [records, setRecords] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load records from localStorage
+  useEffect(() => {
+    const loadRecords = () => {
+      try {
+        const savedRecords = JSON.parse(localStorage.getItem('medical-records') || '[]');
+        // Convert string dates to Date objects
+        const processedRecords = savedRecords.map((record: any) => ({
+          ...record,
+          date: new Date(record.date),
+          icon: typeIcons[record.type] || FileText
+        }));
+        setRecords(processedRecords);
+      } catch (error) {
+        console.error('Error loading records:', error);
+        setRecords([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRecords();
+    // Add event listener for storage changes
+    window.addEventListener('storage', loadRecords);
+    return () => window.removeEventListener('storage', loadRecords);
+  }, []);
+
+  // Handle new document added
+  const handleDocumentAdded = (newDocument: any) => {
+    const processedDoc = {
+      ...newDocument,
+      icon: typeIcons[newDocument.type] || FileText
+    };
+    setRecords(prev => [processedDoc, ...prev]);
+  };
 
   // Filter records based on search query
-  const filteredRecords = MOCK_RECORDS.filter(record => {
+  const filteredRecords = records.filter(record => {
+    if (!record) return false;
+    
     const searchFields = [
-      record.title,
-      record.type,
-      record.provider,
-      record.location,
-      record.description,
-      ...record.documents.map(doc => doc.name)
+      record.title || '',
+      record.type || '',
+      record.provider || '',
+      record.location || '',
+      record.description || '',
+      ...(record.documents?.map((doc: any) => doc.name) || [])
     ].join(' ').toLowerCase();
     
     return searchFields.includes(searchQuery.toLowerCase());
@@ -112,9 +96,10 @@ const TimelineView = () => {
   };
 
   const groupRecordsByYear = () => {
-    const groups: Record<string, typeof MOCK_RECORDS> = {};
+    const groups: Record<string, any[]> = {};
     
     filteredRecords.forEach(record => {
+      if (!record.date) return;
       const year = record.date.getFullYear().toString();
       if (!groups[year]) {
         groups[year] = [];
@@ -153,7 +138,12 @@ const TimelineView = () => {
         </div>
       </div>
 
-      {Object.keys(recordGroups).length === 0 ? (
+      {loading ? (
+        <div className="glass-card p-8 text-center">
+          <Loader2 className="animate-spin h-8 w-8 mx-auto text-medmate-500 mb-4" />
+          <p className="text-muted-foreground">Loading your medical records...</p>
+        </div>
+      ) : Object.keys(recordGroups).length === 0 ? (
         <div className="glass-card p-8 text-center">
           <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium mb-2">No Records Found</h3>
@@ -263,6 +253,7 @@ const TimelineView = () => {
       <DocumentUpload 
         isOpen={isUploadModalOpen} 
         onClose={() => setIsUploadModalOpen(false)} 
+        onDocumentAdded={handleDocumentAdded}
       />
     </div>
   );

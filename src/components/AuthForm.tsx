@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
@@ -16,6 +15,19 @@ import {
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+
+const setCookie = (name: string, value: string, days: number) => {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+};
+
+const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
+};
 
 type AuthFormProps = {
   type: 'sign-in' | 'sign-up';
@@ -58,8 +70,22 @@ const AuthForm = ({ type }: AuthFormProps) => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Mock authentication - in a real app, this would call an auth API
+      // Store user data 
+      if (type === 'sign-up') {
+        const { name, email } = values as SignUpFormValues;
+        localStorage.setItem('medmate-user-profile', JSON.stringify({ name, email, createdAt: new Date() }));
+      }
+      
+      // Set auth in localStorage and cookies (for persistence)
       localStorage.setItem('medmate-authenticated', 'true');
+      setCookie('medmate-auth', 'true', 30); // 30 days session
+
+      // Store user email for persistence
+      const email = (values as any).email;
+      if (email) {
+        localStorage.setItem('medmate-user-email', email);
+        setCookie('medmate-user-email', email, 30);
+      }
       
       // Show success message
       if (type === 'sign-in') {
@@ -195,3 +221,4 @@ const AuthForm = ({ type }: AuthFormProps) => {
 };
 
 export default AuthForm;
+

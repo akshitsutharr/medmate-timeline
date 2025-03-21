@@ -16,9 +16,10 @@ import { toast } from 'sonner';
 type DocumentUploadProps = {
   isOpen: boolean;
   onClose: () => void;
+  onDocumentAdded?: (document: any) => void;
 };
 
-const DocumentUpload = ({ isOpen, onClose }: DocumentUploadProps) => {
+const DocumentUpload = ({ isOpen, onClose, onDocumentAdded }: DocumentUploadProps) => {
   const [title, setTitle] = useState('');
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [recordType, setRecordType] = useState('');
@@ -49,9 +50,32 @@ const DocumentUpload = ({ isOpen, onClose }: DocumentUploadProps) => {
     
     setIsSubmitting(true);
     
-    // Simulate upload process
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create document object
+      const newDocument = {
+        id: Date.now(),
+        date,
+        type: recordType,
+        title,
+        provider,
+        location,
+        description,
+        documents: files.map(file => ({
+          name: file.name,
+          size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+          file
+        })),
+      };
+      
+      // Save to localStorage
+      const existingDocs = JSON.parse(localStorage.getItem('medical-records') || '[]');
+      const updatedDocs = [newDocument, ...existingDocs];
+      localStorage.setItem('medical-records', JSON.stringify(updatedDocs));
+      
+      // Call callback if exists
+      if (onDocumentAdded) {
+        onDocumentAdded(newDocument);
+      }
       
       toast.success('Medical record added successfully');
       resetForm();

@@ -23,13 +23,14 @@ const useLocomotiveScroll = ({
   useEffect(() => {
     if (!ref.current || !initOnMount) return;
 
-    // Initialize Locomotive Scroll
+    // Initialize Locomotive Scroll with proper typing
     locomotiveScrollRef.current = new LocomotiveScroll({
-      el: ref.current,
+      // Type assertion to accommodate locomotive-scroll's types
+      el: ref.current as HTMLElement,
       smooth,
       multiplier,
       class: className,
-    });
+    } as any);
 
     // Clean up
     return () => {

@@ -73,6 +73,7 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: hidden;
   }
 }
 
@@ -119,6 +120,14 @@
 
   .pulse-on-hover {
     @apply transition-transform duration-300 hover:scale-[1.03];
+  }
+  
+  .shadow-glass {
+    @apply shadow-lg shadow-gray-200/50 dark:shadow-slate-900/50;
+  }
+  
+  .shadow-glass-strong {
+    @apply shadow-xl shadow-gray-200/70 dark:shadow-slate-900/70;
   }
 }
 
@@ -167,15 +176,49 @@ html.has-scroll-dragging {
 }
 
 /* Fix for overlapping text and buttons */
-.TabsTrigger {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+[data-state="active"] {
+  z-index: 2;
 }
 
+/* Responsive fixes */
 @media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
   .TabsTrigger {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .TabsTrigger svg {
+    margin-right: 0.25rem;
+  }
+}
+
+/* Animation classes */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
   }
 }

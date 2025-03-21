@@ -12,26 +12,53 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Brain, FileText, User } from 'lucide-react';
 import { useScroll } from '@/contexts/ScrollContext';
 
+// Get cookie helper
+const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
+};
+
 const Profile = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { containerRef } = useScroll();
   
   useEffect(() => {
-    // Check if user is authenticated
-    const authStatus = localStorage.getItem('medmate-authenticated');
-    setIsAuthenticated(authStatus === 'true');
+    // Check if user is authenticated from both localStorage and cookies
+    const checkAuth = () => {
+      const localAuth = localStorage.getItem('medmate-authenticated');
+      const cookieAuth = getCookie('medmate-auth');
+      const isAuth = localAuth === 'true' || cookieAuth === 'true';
+      
+      setIsAuthenticated(isAuth);
+      
+      // If not authenticated, redirect
+      if (!isAuth) {
+        navigate('/sign-in');
+        return;
+      }
+      
+      // Check if user needs onboarding
+      const userProfile = localStorage.getItem('medmate-user-profile');
+      setNeedsOnboarding(!userProfile);
+      setIsLoading(false);
+    };
     
-    // Check if user needs onboarding
-    const userProfile = localStorage.getItem('medmate-user-profile');
-    setNeedsOnboarding(!userProfile);
-    
-    // Redirect to sign in if not authenticated
-    if (authStatus !== 'true') {
-      navigate('/sign-in');
-    }
+    checkAuth();
   }, [navigate]);
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center dark:bg-slate-900">
+        <div className="animate-spin w-10 h-10 border-4 border-medmate-500 border-t-transparent rounded-full"></div>
+        <p className="mt-4 text-muted-foreground">Loading your profile...</p>
+      </div>
+    );
+  }
   
   if (!isAuthenticated) {
     return null; // Don't render anything while redirecting
@@ -41,25 +68,25 @@ const Profile = () => {
     <div className="min-h-screen flex flex-col dark:bg-slate-900 transition-colors duration-300" data-scroll-section>
       <Navbar />
       
-      <main className="flex-grow p-6 md:p-8 pt-24" data-scroll-section>
-        <div className="container">
+      <main className="flex-grow p-4 md:p-8 pt-20 md:pt-24" data-scroll-section>
+        <div className="container max-w-7xl mx-auto">
           {needsOnboarding ? (
             <Onboarding />
           ) : (
             <div className="w-full max-w-7xl mx-auto">
               <Tabs defaultValue="profile" className="w-full animate-fade-in">
-                <TabsList className="grid grid-cols-3 mb-8">
+                <TabsList className="grid w-full grid-cols-3 mb-8">
                   <TabsTrigger value="profile" className="data-[state=active]:bg-medmate-500 data-[state=active]:text-white dark:data-[state=active]:bg-medmate-600">
                     <User className="h-4 w-4 mr-2" />
-                    Profile
+                    <span className="truncate">Profile</span>
                   </TabsTrigger>
                   <TabsTrigger value="ai-assistant" className="data-[state=active]:bg-medmate-500 data-[state=active]:text-white dark:data-[state=active]:bg-medmate-600">
                     <Brain className="h-4 w-4 mr-2" />
-                    AI Assistant
+                    <span className="truncate">AI Assistant</span>
                   </TabsTrigger>
                   <TabsTrigger value="medical-documents" className="data-[state=active]:bg-medmate-500 data-[state=active]:text-white dark:data-[state=active]:bg-medmate-600">
                     <FileText className="h-4 w-4 mr-2" />
-                    Documents
+                    <span className="truncate">Documents</span>
                   </TabsTrigger>
                 </TabsList>
                 
