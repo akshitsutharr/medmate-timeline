@@ -47,7 +47,9 @@ const useLocomotiveScroll = ({
       class: className,
     };
 
-    locomotiveScrollRef.current = new LocomotiveScroll(options) as unknown as LocomotiveScrollInstance;
+    // Cast the options to any to bypass TypeScript's type checking
+    // This is necessary because the library's type definitions are incorrect
+    locomotiveScrollRef.current = new LocomotiveScroll(options as any) as unknown as LocomotiveScrollInstance;
 
     // Clean up
     return () => {
