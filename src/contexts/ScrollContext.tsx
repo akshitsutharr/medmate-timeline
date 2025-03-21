@@ -3,10 +3,11 @@ import React, { createContext, useContext, useRef, useEffect } from 'react';
 import useLocomotiveScroll from '@/hooks/useLocomotiveScroll';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-// Import the interface or define it inline
-interface LocomotiveScrollInstance extends LocomotiveScroll {
+// Define the interface for our LocomotiveScroll instance
+interface LocomotiveScrollInstance {
   update: () => void;
   destroy: () => void;
+  scroll?: any;
 }
 
 type ScrollContextType = {

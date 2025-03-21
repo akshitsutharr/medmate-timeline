@@ -12,9 +12,10 @@ interface UseLocomotiveScrollOptions {
 }
 
 // Define a more complete interface for the LocomotiveScroll instance
-interface LocomotiveScrollInstance extends LocomotiveScroll {
-  update: () => void;
+interface LocomotiveScrollInstance {
   destroy: () => void;
+  update: () => void;
+  scroll: LocomotiveScroll;
 }
 
 const useLocomotiveScroll = ({
@@ -31,11 +32,11 @@ const useLocomotiveScroll = ({
 
     // Initialize Locomotive Scroll with proper typing
     locomotiveScrollRef.current = new LocomotiveScroll({
-      el: ref.current as HTMLElement,
+      el: ref.current,
       smooth,
       multiplier,
       class: className,
-    }) as LocomotiveScrollInstance;
+    }) as unknown as LocomotiveScrollInstance;
 
     // Clean up
     return () => {
