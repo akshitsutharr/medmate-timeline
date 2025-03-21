@@ -18,6 +18,15 @@ interface LocomotiveScrollInstance {
   scroll: LocomotiveScroll;
 }
 
+// Define custom options interface since the library's types are incorrect
+interface CustomLocomotiveOptions {
+  el: HTMLElement;
+  smooth?: boolean;
+  multiplier?: number;
+  class?: string;
+  [key: string]: any; // Allow additional properties
+}
+
 const useLocomotiveScroll = ({
   ref,
   smooth = true,
@@ -30,13 +39,15 @@ const useLocomotiveScroll = ({
   useEffect(() => {
     if (!ref.current || !initOnMount) return;
 
-    // Initialize Locomotive Scroll with proper typing
-    locomotiveScrollRef.current = new LocomotiveScroll({
+    // Initialize Locomotive Scroll with custom options type
+    const options: CustomLocomotiveOptions = {
       el: ref.current,
       smooth,
       multiplier,
       class: className,
-    }) as unknown as LocomotiveScrollInstance;
+    };
+
+    locomotiveScrollRef.current = new LocomotiveScroll(options) as unknown as LocomotiveScrollInstance;
 
     // Clean up
     return () => {
